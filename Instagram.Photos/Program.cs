@@ -11,6 +11,7 @@ using Instagram.Photos.AuthService;
 using System.Windows.Forms;
 using System.Net.Http;
 using System.Configuration;
+using System.Threading;
 
 namespace Instagram.Photos
 {
@@ -23,8 +24,13 @@ namespace Instagram.Photos
             string clientSecret = ConfigurationManager.AppSettings["clientSecret"];
             string tagName = ConfigurationManager.AppSettings["tagName"];
             string outputDir = ConfigurationManager.AppSettings["outputDir"];
-            string wcfHostAddress = ConfigurationManager.AppSettings["wcfHostAddress"];
+            string hostAddress = ConfigurationManager.AppSettings["hostAddress"];
 
+            var instagramService = new InstagramAuthService(new Uri(hostAddress));
+            
+            instagramService.Open();
+
+            Console.Write("server opened");
             //if (!Directory.Exists(outputDir))
             //    throw new DirectoryNotFoundException("Dir was not found");
             
@@ -50,6 +56,7 @@ namespace Instagram.Photos
             WebRequest webRequest = null;
             string nextPageUrl = String.Empty;
 
+            Console.Read();
 
             do
             {

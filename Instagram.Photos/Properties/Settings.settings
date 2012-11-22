@@ -1,0 +1,21 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Instagram.Photos.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="clientId" Type="System.String" Scope="User">
+      <Value Profile="(Default)">tet</Value>
+    </Setting>
+    <Setting Name="clientSecret" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">secret</Value>
+    </Setting>
+    <Setting Name="tagName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">tag</Value>
+    </Setting>
+    <Setting Name="outputDir" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">C:\temp</Value>
+    </Setting>
+    <Setting Name="hostAddress" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">http://localhost:50321</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

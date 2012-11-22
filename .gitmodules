@@ -1,0 +1,3 @@
+[submodule "aspnetwebstack"]
+	path = aspnetwebstack
+	url = https://git01.codeplex.com/aspnetwebstack.git

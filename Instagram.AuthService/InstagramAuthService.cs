@@ -1,60 +1,104 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.ServiceModel;
 using System.ServiceModel.Description;
 using System.ServiceModel.Web;
+using System.Web.Http;
+using System.Web.Http.SelfHost;
 
 namespace Instagram.Photos.AuthService
 {
-
-    [ServiceContract(Namespace = "instagramService",
-      Name = "instagramContract")]
-    public interface IInstagramAuth
+    /// <summary>
+    /// COntroller which will take care of the authentication
+    /// </summary>
+    public class InstagramController : ApiController
     {
-        [OperationContract]
-        [WebGet(UriTemplate = "?code={tag}")]
-        string AuthGet(string codeGet);
-    }
-
-    public class InstagramAuthServiceProgram
-    {
-        public ServiceHost InstagramAuthService { get; set; }
-
-        public InstagramAuthServiceProgram(string address)
+        public InstagramController()
         {
-            Uri baseAddress = new Uri(address);
-            InstagramAuthService = new ServiceHost(typeof(InstagramAuthService), baseAddress);
-            ServiceEndpoint ep = InstagramAuthService.AddServiceEndpoint(typeof(IInstagramAuth), new WebHttpBinding(), "");
-            ServiceMetadataBehavior smb = new ServiceMetadataBehavior();
-            smb.HttpGetEnabled = true;
-            smb.MetadataExporter.PolicyVersion = PolicyVersion.Policy15;
-            smb.HttpGetBinding = ep.Binding;
-            InstagramAuthService.Description.Behaviors.Add(smb);
-
+            Console.Write("This was created");
         }
 
+        /// <summary>
+        /// Authentication action
+        /// </summary>
+        /// <param name="code">code parameter that will be passed</param>
+        /// <returns></returns>
+        public string Auth(string code)
+        {
+            return code;
+        }
+    }
+
+    /// <summary>
+    /// The Self host service class
+    /// </summary>
+    public class InstagramAuthService
+    {
+        /// <summary>
+        /// Self host configuration
+        /// </summary>
+        private HttpSelfHostConfiguration Configuration { get; set; }
+        /// <summary>
+        /// Self host server 
+        /// </summary>
+        private HttpSelfHostServer Server { get; set; }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="address">THe http address to bind</param>
+        public InstagramAuthService(Uri address)
+        {
+            Configuration = new HttpSelfHostConfiguration(address);
+
+            Configuration.Routes.MapHttpRoute("default", "{controller}/{action}/{code}", new { code = RouteParameter.Optional });
+
+            Server = new HttpSelfHostServer(Configuration);
+        }
+
+        /// <summary>
+        /// Destructor
+        /// </summary>
+        ~InstagramAuthService()
+        {
+            Close();
+        }
+
+        /// <summary>
+        /// Open the server (async)
+        /// </summary>
         public void Open()
         {
-            if (InstagramAuthService != null)
-                InstagramAuthService.Open();
+            try
+            {
+                Server.OpenAsync();
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("There was a problem while trying to open the server, verify you have administrative rights");
+            }
 
         }
 
+        /// <summary>
+        /// Close the server
+        /// </summary>
         public void Close()
         {
-            if (InstagramAuthService != null)
-                InstagramAuthService.Close();
+            try
+            {
+                if (Server != null)
+                    Server.CloseAsync();
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("There was a problem while trying to close the server");
+            }
+            
         }
     }
 
-    [ServiceBehavior(AddressFilterMode = AddressFilterMode.Prefix)]
-    public class InstagramAuthService : IInstagramAuth
-    {
-        public string AuthGet(string codeGet)
-        {
-            return "is this working?";
-        }
-    }
 }

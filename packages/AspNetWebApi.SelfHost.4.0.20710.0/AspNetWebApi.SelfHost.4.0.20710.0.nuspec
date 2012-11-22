@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>AspNetWebApi.SelfHost</id>
+    <version>4.0.20710.0</version>
+    <title>ASP.NET Web API Self Host</title>
+    <authors>Microsoft</authors>
+    <owners>Microsoft</owners>
+    <licenseUrl>http://www.microsoft.com/web/webpi/eula/MVC_4_eula_ENU.htm</licenseUrl>
+    <projectUrl>http://www.asp.net/web-api</projectUrl>
+    <iconUrl>https://download-codeplex.sec.s-msft.com/Download?ProjectName=aspnetwebstack&amp;DownloadId=360555</iconUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>Legacy package, AspNetWebApi.SelfHost is now included in the 'Microsoft.AspNet.WebApi.SelfHost' package.</description>
+    <summary>Legacy package, AspNetWebApi.SelfHost is now included in the 'Microsoft.AspNet.WebApi.SelfHost' package.</summary>
+    <dependencies>
+      <dependency id="Microsoft.AspNet.WebApi.SelfHost" version="[4.0.20710.0, 4.1)" />
+    </dependencies>
+  </metadata>
+</package>

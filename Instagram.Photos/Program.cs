@@ -1,67 +1,67 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Web;
 using System.IO;
+using Instagram.AuthService;
 using Newtonsoft.Json.Linq;
 using Instagram.Photos.AuthService;
 using System.Windows.Forms;
-using System.Net.Http;
-using System.Configuration;
-using System.Threading;
+using Instagram.Photos.Properties;
 
 namespace Instagram.Photos
 {
     class Program
     {
+        [STAThread]
         static void Main(string[] args)
         {
             //read from application configuration
-            string clientId = ConfigurationManager.AppSettings["clientId"];
-            string clientSecret = ConfigurationManager.AppSettings["clientSecret"];
-            string tagName = ConfigurationManager.AppSettings["tagName"];
-            string outputDir = ConfigurationManager.AppSettings["outputDir"];
-            string hostAddress = ConfigurationManager.AppSettings["hostAddress"];
+            string clientId = Settings.Default.clientId;
+            string clientSecret = Settings.Default.clientSecret;
+            string tagName = Settings.Default.tagName;
+            string outputDir = Settings.Default.outputDir;
+            string hostAddress = Settings.Default.hostAddress;
 
+            //Create server instance
             var instagramService = new InstagramAuthService(new Uri(hostAddress));
             
+            //open the authentication server async and wait
             instagramService.Open();
 
-            Console.Write("server opened");
-            //if (!Directory.Exists(outputDir))
-            //    throw new DirectoryNotFoundException("Dir was not found");
+            Console.WriteLine("server opened...");
             
-            //following code needs to be implemented if we need to collect the images from closed users
+
+
             //try to get user authentication
-            //Application.Run(new InsntagramAuthForm(String.Format("https://api.instagram.com/oauth/authorize?client_id={0}&client_secret={1}&grant_type=authorization_code&redirect_uri=http://localhost:8080/Auth&redirect_type=code", client_id, client_secret));
+            Application.Run(new InstagramAuthForm(String.Format("https://api.instagram.com/oauth/authorize?client_id={0}&client_secret={1}&response_type=code&redirect_uri={2}/instagram/Auth&redirect_type=code", clientId, clientSecret, hostAddress)));;
 
             //Try to post the code to server to get authorization code
-            //NameValueCollection parameters = new NameValueCollection();
-            //parameters.Add("client_id", client_id);
-            //parameters.Add("client_secret", clientSecret);
-            //parameters.Add("grant_type", "authorization_code");
-            //parameters.Add("redirect_uri", "http://localhost:8080");
-            //var code = "";
-            //parameters.Add("response_type", code);
+            NameValueCollection parameters = new NameValueCollection();
+            parameters.Add("client_id", clientId);
+            parameters.Add("client_secret", clientSecret);
+            parameters.Add("grant_type", "authorization_code");
+            parameters.Add("redirect_uri", string.Format("{0}/instagram/Auth", hostAddress));
+            parameters.Add("code", InstagramCodeContainer.GetInstance().AccessToken);
             
-            //WebClient client = new WebClient();
-            //var result = client.UploadValues("https://api.instagram.com/oauth/access_token/", parameters);
+            WebClient client = new WebClient();
+            var result = client.UploadValues(new Uri("https://api.instagram.com/oauth/access_token/"), parameters);
 
-            //var response = System.Text.Encoding.Default.GetString(result);
-            //Console.Read();
+            var response = Encoding.Default.GetString(result);
+
+            string responseAccessToken = JObject.Parse(response).SelectToken("access_token").ToString();
 
             WebRequest webRequest = null;
             string nextPageUrl = String.Empty;
 
+            Console.WriteLine("we are ready to start downloading your photos, please hit enter...");
             Console.Read();
 
             do
             {
                 if (webRequest == null && string.IsNullOrEmpty(nextPageUrl))
-                    webRequest = HttpWebRequest.Create(String.Format("https://api.instagram.com/v1/tags/{0}/media/recent?client_id={1}", tagName, clientId));
+                    webRequest = HttpWebRequest.Create(String.Format("https://api.instagram.com/v1/tags/{0}/media/recent?access_token={1}", tagName, responseAccessToken));
                 else
                     webRequest = HttpWebRequest.Create(nextPageUrl);
 

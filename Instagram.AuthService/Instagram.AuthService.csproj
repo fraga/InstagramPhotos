@@ -74,6 +74,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="InstagramAuthController.cs" />
     <Compile Include="InstagramAuthForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -81,6 +82,7 @@
       <DependentUpon>InstagramAuthForm.cs</DependentUpon>
     </Compile>
     <Compile Include="InstagramAuthService.cs" />
+    <Compile Include="InstagramCodeContainer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

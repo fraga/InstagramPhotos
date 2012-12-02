@@ -1,37 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.ServiceModel;
-using System.ServiceModel.Description;
-using System.ServiceModel.Web;
 using System.Web.Http;
 using System.Web.Http.SelfHost;
 
 namespace Instagram.Photos.AuthService
 {
-    /// <summary>
-    /// COntroller which will take care of the authentication
-    /// </summary>
-    public class InstagramController : ApiController
-    {
-        public InstagramController()
-        {
-            Console.Write("This was created");
-        }
-
-        /// <summary>
-        /// Authentication action
-        /// </summary>
-        /// <param name="code">code parameter that will be passed</param>
-        /// <returns></returns>
-        public string Auth(string code)
-        {
-            return code;
-        }
-    }
-
+    
     /// <summary>
     /// The Self host service class
     /// </summary>
@@ -55,7 +28,6 @@ namespace Instagram.Photos.AuthService
             Configuration = new HttpSelfHostConfiguration(address);
 
             Configuration.Routes.MapHttpRoute("default", "{controller}/{action}/{code}", new { code = RouteParameter.Optional });
-
             Server = new HttpSelfHostServer(Configuration);
         }
 
@@ -68,13 +40,13 @@ namespace Instagram.Photos.AuthService
         }
 
         /// <summary>
-        /// Open the server (async)
+        /// Open the server (async) and wait
         /// </summary>
         public void Open()
         {
             try
             {
-                Server.OpenAsync();
+                Server.OpenAsync().Wait();
             }
             catch (Exception)
             {
@@ -84,14 +56,14 @@ namespace Instagram.Photos.AuthService
         }
 
         /// <summary>
-        /// Close the server
+        /// Close the server async and wait
         /// </summary>
         public void Close()
         {
             try
             {
                 if (Server != null)
-                    Server.CloseAsync();
+                    Server.CloseAsync().Wait();
             }
             catch (Exception)
             {
@@ -99,6 +71,7 @@ namespace Instagram.Photos.AuthService
             }
             
         }
+
     }
 
 }

@@ -101,8 +101,7 @@ namespace Instagram.Photos
 
                             var imageId = image.SelectToken("id");
 
-                            using (var imageWriter = new StreamWriter(String.Format("{0}\\{1}.jpg", outputDir, imageId))
-                                )
+                            using (var imageWriter = new StreamWriter(String.Format("{0}\\{1}.jpg", outputDir, imageId)))
                             {
                                 imageResponse.CopyTo(imageWriter.BaseStream);
                                 imageResponse.Flush();

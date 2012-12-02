@@ -6,7 +6,7 @@ namespace Instagram.Photos.AuthService
     /// <summary>
     /// COntroller which will take care of the authentication
     /// </summary>
-    public class InstagramAuthController : ApiController
+    public class InstagramController : ApiController
     {
         /// <summary>
         /// Authentication action

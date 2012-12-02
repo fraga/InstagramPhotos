@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.IO;
+using System.Threading.Tasks;
 using Instagram.AuthService;
 using Newtonsoft.Json.Linq;
 using Instagram.Photos.AuthService;
@@ -66,7 +67,7 @@ namespace Instagram.Photos
                     webRequest = HttpWebRequest.Create(nextPageUrl);
 
                 var responseStream = webRequest.GetResponse().GetResponseStream();
-                Encoding encode = System.Text.Encoding.Default;
+                Encoding encode = Encoding.Default;
 
 
                 using (StreamReader reader = new StreamReader(responseStream, encode))
@@ -85,25 +86,29 @@ namespace Instagram.Photos
 
                     var images = token.SelectToken("data").ToArray();
 
-                    foreach (var image in images)
-                    {
-                        var imageUrl = image.SelectToken("images").SelectToken("standard_resolution").SelectToken("url").ToString();
-
-                        if (String.IsNullOrEmpty(imageUrl))
-                            Console.WriteLine("broken image URL");
-
-                        var imageResponse = HttpWebRequest.Create(imageUrl).GetResponse().GetResponseStream();
-
-                        var imageId = image.SelectToken("id");
-
-                        using(var imageWriter = new StreamWriter(String.Format("{0}\\{1}.jpg", outputDir, imageId)))
+                    Parallel.ForEach(images, image =>
                         {
-                            imageResponse.CopyTo(imageWriter.BaseStream);
-                            imageResponse.Flush();
-                            Console.WriteLine("copied {0}", imageId);
-                        }
+                            var imageUrl =
+                                image.SelectToken("images")
+                                     .SelectToken("standard_resolution")
+                                     .SelectToken("url")
+                                     .ToString();
 
-                    }
+                            if (String.IsNullOrEmpty(imageUrl))
+                                Console.WriteLine("broken image URL");
+
+                            var imageResponse = HttpWebRequest.Create(imageUrl).GetResponse().GetResponseStream();
+
+                            var imageId = image.SelectToken("id");
+
+                            using (var imageWriter = new StreamWriter(String.Format("{0}\\{1}.jpg", outputDir, imageId))
+                                )
+                            {
+                                imageResponse.CopyTo(imageWriter.BaseStream);
+                                imageResponse.Flush();
+                                Console.WriteLine("copied {0}", imageId);
+                            }
+                        });
 
 
                 }

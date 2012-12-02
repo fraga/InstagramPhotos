@@ -27,25 +27,27 @@ namespace Instagram.Photos
 
             //Create server instance
             var instagramService = new InstagramAuthService(new Uri(hostAddress));
-            
+
             //open the authentication server async and wait
             instagramService.Open();
 
             Console.WriteLine("server opened...");
-            
+
 
 
             //try to get user authentication
-            Application.Run(new InstagramAuthForm(String.Format("https://api.instagram.com/oauth/authorize?client_id={0}&client_secret={1}&response_type=code&redirect_uri={2}/instagram/Auth&redirect_type=code", clientId, clientSecret, hostAddress)));;
+            Application.Run(new InstagramAuthForm(String.Format("https://api.instagram.com/oauth/authorize?client_id={0}&client_secret={1}&response_type=code&redirect_uri={2}/instagram/Auth&redirect_type=code", clientId, clientSecret, hostAddress)));
 
             //Try to post the code to server to get authorization code
-            NameValueCollection parameters = new NameValueCollection();
-            parameters.Add("client_id", clientId);
-            parameters.Add("client_secret", clientSecret);
-            parameters.Add("grant_type", "authorization_code");
-            parameters.Add("redirect_uri", string.Format("{0}/instagram/Auth", hostAddress));
-            parameters.Add("code", InstagramCodeContainer.GetInstance().AccessToken);
-            
+            NameValueCollection parameters = new NameValueCollection
+                {
+                    {"client_id", clientId},
+                    {"client_secret", clientSecret},
+                    {"grant_type", "authorization_code"},
+                    {"redirect_uri", string.Format("{0}/instagram/Auth", hostAddress)},
+                    {"code", InstagramCodeContainer.GetInstance().AccessToken}
+                };
+
             WebClient client = new WebClient();
             var result = client.UploadValues(new Uri("https://api.instagram.com/oauth/access_token/"), parameters);
 
@@ -97,12 +99,15 @@ namespace Instagram.Photos
                             if (String.IsNullOrEmpty(imageUrl))
                                 Console.WriteLine("broken image URL");
 
-                            var imageResponse = HttpWebRequest.Create(imageUrl).GetResponse().GetResponseStream();
+                            var imageResponse = WebRequest.Create(imageUrl).GetResponse().GetResponseStream();
 
                             var imageId = image.SelectToken("id");
 
                             using (var imageWriter = new StreamWriter(String.Format("{0}\\{1}.jpg", outputDir, imageId)))
                             {
+                                //to avoid exception here let's leave this item's loop if something happened
+                                if (imageResponse == null) return;
+
                                 imageResponse.CopyTo(imageWriter.BaseStream);
                                 imageResponse.Flush();
                                 Console.WriteLine("copied {0}", imageId);
@@ -114,7 +119,7 @@ namespace Instagram.Photos
 
             }
             while (!String.IsNullOrEmpty(nextPageUrl));
-            
+
             Console.Read();
         }
 

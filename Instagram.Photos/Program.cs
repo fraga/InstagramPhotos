@@ -74,20 +74,26 @@ namespace Instagram.Photos
                 var responseStream = webRequest.GetResponse().GetResponseStream();
                 Encoding encode = Encoding.Default;
 
+                StringBuilder content = new StringBuilder();
 
                 using (StreamReader reader = new StreamReader(responseStream, encode))
                 {
-                    JToken token = JObject.Parse(reader.ReadToEnd());
-                    var pagination = token.SelectToken("pagination");
+                    while (!reader.EndOfStream)
+                        content.Append(reader.ReadLine());
+                }
 
-                    if (pagination != null && pagination.SelectToken("next_url") != null)
+                JToken token = JObject.Parse(content.ToString());
+                var pagination = token.SelectToken("pagination");
+
+                if (pagination != null && pagination.SelectToken("next_url") != null)
+                {
+                    nextPageUrl = pagination.SelectToken("next_url").ToString();
+                }
+                else
+                {
+                    nextPageUrl = null;
+                }
                     {
-                        nextPageUrl = pagination.SelectToken("next_url").ToString();
-                    }
-                    else
-                    {
-                        nextPageUrl = null;
-                    }
 
                     var images = token.SelectToken("data").ToArray();
 
@@ -118,7 +124,6 @@ namespace Instagram.Photos
                         });
 
 
-                }
 
             }
             while (!String.IsNullOrEmpty(nextPageUrl));

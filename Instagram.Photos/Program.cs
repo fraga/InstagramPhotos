@@ -49,7 +49,7 @@ namespace Instagram.Photos
                 };
 
             WebClient client = new WebClient();
-            var result = client.UploadValues(new Uri("https://api.instagram.com/oauth/access_token/"), parameters);
+            var result = client.UploadValues(new Uri("https://api.instagram.com/oauth/access_token"), parameters);
 
             var response = Encoding.Default.GetString(result);
 

@@ -61,6 +61,9 @@ namespace Instagram.Photos
             Console.WriteLine("we are ready to start downloading your photos, please hit enter...");
             Console.Read();
 
+            if (!Directory.Exists(outputDir))
+                Directory.CreateDirectory(outputDir);
+
             do
             {
                 if (webRequest == null && string.IsNullOrEmpty(nextPageUrl))

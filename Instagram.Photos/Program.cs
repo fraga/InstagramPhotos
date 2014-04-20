@@ -93,36 +93,36 @@ namespace Instagram.Photos
                 {
                     nextPageUrl = null;
                 }
+
+                var images = token.SelectToken("data").ToArray();
+
+                Parallel.ForEach(images, image =>
                     {
                         var imageId = image.SelectToken("id");
 
                         if (File.Exists(string.Format("{0}\\{1}.jpg", outputDir, imageId)))
                             return;
 
-                    Parallel.ForEach(images, image =>
+                        var imageUrl =
+                            image.SelectToken("images")
+                                 .SelectToken("standard_resolution")
+                                 .SelectToken("url")
+                                 .ToString();
+
+                        if (String.IsNullOrEmpty(imageUrl))
+                            Console.WriteLine("broken image URL");
+
+                        var imageResponse = WebRequest.Create(imageUrl).GetResponse().GetResponseStream();
+
+
+                        using (var imageWriter = new StreamWriter(String.Format("{0}\\{1}.jpg", outputDir, imageId)))
                         {
-                            var imageUrl =
-                                image.SelectToken("images")
-                                     .SelectToken("standard_resolution")
-                                     .SelectToken("url")
-                                     .ToString();
+                            //to avoid exception here let's leave this item's loop if something happened
+                            if (imageResponse == null) return;
 
-                            if (String.IsNullOrEmpty(imageUrl))
-                                Console.WriteLine("broken image URL");
-
-                            var imageResponse = WebRequest.Create(imageUrl).GetResponse().GetResponseStream();
-
-
-                            using (var imageWriter = new StreamWriter(String.Format("{0}\\{1}.jpg", outputDir, imageId)))
-                            {
-                                //to avoid exception here let's leave this item's loop if something happened
-                                if (imageResponse == null) return;
-
-                                imageResponse.CopyTo(imageWriter.BaseStream);
-                                imageResponse.Flush();
-                                Console.WriteLine("copied {0}", imageId);
-                            }
-                        });
+                            imageResponse.CopyTo(imageWriter.BaseStream);
+                            imageResponse.Flush();
+                        }
 
                         var caption = image.SelectToken("caption").SelectToken("text");
 
@@ -130,6 +130,7 @@ namespace Instagram.Photos
                         {
                             captionText.Write(caption);
                         }
+                    });
 
             }
             while (!String.IsNullOrEmpty(nextPageUrl));

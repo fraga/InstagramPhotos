@@ -124,7 +124,12 @@ namespace Instagram.Photos
                             }
                         });
 
+                        var caption = image.SelectToken("caption").SelectToken("text");
 
+                        using (var captionText = new StreamWriter(string.Format("{0}\\{1}.txt", outputDir, imageId)))
+                        {
+                            captionText.Write(caption);
+                        }
 
             }
             while (!String.IsNullOrEmpty(nextPageUrl));

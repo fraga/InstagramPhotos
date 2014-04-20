@@ -94,8 +94,10 @@ namespace Instagram.Photos
                     nextPageUrl = null;
                 }
                     {
+                        var imageId = image.SelectToken("id");
 
-                    var images = token.SelectToken("data").ToArray();
+                        if (File.Exists(string.Format("{0}\\{1}.jpg", outputDir, imageId)))
+                            return;
 
                     Parallel.ForEach(images, image =>
                         {
@@ -110,7 +112,6 @@ namespace Instagram.Photos
 
                             var imageResponse = WebRequest.Create(imageUrl).GetResponse().GetResponseStream();
 
-                            var imageId = image.SelectToken("id");
 
                             using (var imageWriter = new StreamWriter(String.Format("{0}\\{1}.jpg", outputDir, imageId)))
                             {
